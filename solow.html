@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solow Model – Interactive</title>
+<style>
+  :root{--ink:#0f172a;--muted:#475569;--acc:#0ea5e9}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:#ffffff}
+  .wrap{max-width:1040px;margin:0 auto;padding:18px}
+  h1{font-size:24px;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:14px}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;align-items:start}
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px}
+  .controls{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .row{display:grid;grid-template-columns:170px 1fr 90px;gap:8px;align-items:center}
+  .out{border:1px solid #e2e8f0;border-radius:10px;padding:6px 8px;font-family:ui-monospace}
+  svg{max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:12px;background:#fff}
+  small.muted{color:#64748b}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}.controls{grid-template-columns:1fr}.row{grid-template-columns:1fr 1fr 80px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Solow Growth (per worker)</h1>
+  <div class="sub">s·f(k) = (δ + n)·k; f(k)=k^α. Điều chỉnh tham số để xem k* và y*.</div>
+  <div class="grid">
+    <div class="card">
+      <div class="controls">
+        <div class="row"><label>s (tiết kiệm)</label><input id="s" type="range" min="0.10" max="0.50" step="0.01" value="0.30"><div class="out" id="so">0.30</div></div>
+        <div class="row"><label>δ (khấu hao)</label><input id="d" type="range" min="0.01" max="0.10" step="0.005" value="0.05"><div class="out" id="do">0.05</div></div>
+        <div class="row"><label>n (dân số)</label><input id="n" type="range" min="0.00" max="0.05" step="0.005" value="0.015"><div class="out" id="no">0.015</div></div>
+        <div class="row"><label>α (hàm sản xuất)</label><input id="a" type="range" min="0.20" max="0.60" step="0.02" value="0.33"><div class="out" id="ao">0.33</div></div>
+      </div>
+      <div style="margin-top:12px">
+        <svg id="solow" viewBox="0 0 560 360" xmlns="http://www.w3.org/2000/svg" aria-label="Solow mini chart">
+          <rect x="0" y="0" width="560" height="360" fill="#ffffff" rx="12"/>
+          <line x1="60" y1="20" x2="60" y2="320" stroke="#334155" stroke-width="2"/>
+          <line x1="60" y1="320" x2="530" y2="320" stroke="#334155" stroke-width="2"/>
+          <text x="540" y="330" font-size="12" fill="#334155">k</text>
+          <text x="48" y="16" font-size="12" fill="#334155">y</text>
+          <g id="curves"></g>
+          <g id="marks"></g>
+        </svg>
+      </div>
+      <small class="muted">Cân bằng: k* = [ s / (δ + n) ]^{1/(1−α)},  y* = k*^{α}.</small>
+    </div>
+    <div class="card">
+      <h3>Kết quả</h3>
+      <ul>
+        <li>k* = <strong id="kstar">—</strong></li>
+        <li>y* = <strong id="ystar">—</strong></li>
+      </ul>
+      <h3>Giải thích nhanh</h3>
+      <p>Đường <b>s·f(k)</b> (xanh) giao <b>(δ+n)k</b> (xám) tại k*. Tăng s hoặc giảm δ+n → k* tăng.</p>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const s=$('s'), d=$('d'), n=$('n'), a=$('a');
+  const so=$('so'), do_=$('do'), no=$('no'), ao=$('ao');
+  const kO=$('kstar'), yO=$('ystar');
+  const svg=$('solow'), curves=svg.querySelector('#curves'), marks=svg.querySelector('#marks');
+  const X=k=>60 + k*((530-60)/30); // k in [0,30]
+  const Y=y=>320 - y*((320-30)/8); // y in [0,8]
+
+  function path(points, color){
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d', 'M'+points.map(pt=>pt.join(',')).join(' L '));
+    p.setAttribute('fill','none'); p.setAttribute('stroke',color); p.setAttribute('stroke-width','3');
+    curves.appendChild(p); return p;
+  }
+  function clear(g){while(g.firstChild)g.removeChild(g.firstChild)}
+
+  function update(){
+    so.textContent=parseFloat(s.value).toFixed(2);
+    do_.textContent=parseFloat(d.value).toFixed(3);
+    no.textContent=parseFloat(n.value).toFixed(3);
+    ao.textContent=parseFloat(a.value).toFixed(2);
+
+    const sv=+s.value, dv=+d.value, nv=+n.value, av=+a.value;
+    const kstar=Math.pow(sv/(dv+nv), 1/(1-av));
+    const ystar=Math.pow(kstar, av);
+    kO.textContent=kstar.toFixed(2); yO.textContent=ystar.toFixed(2);
+
+    clear(curves); clear(marks);
+    // s f(k)
+    const pts1=[]; for(let k=0;k<=30;k+=0.3){const y=sv*Math.pow(k,av); pts1.push([X(k),Y(y)]);} path(pts1,'#0ea5e9');
+    // (d+n)k
+    const pts2=[[X(0),Y(0)],[X(30),Y((dv+nv)*30)]]; path(pts2,'#94a3b8');
+    // markers
+    const kk=Math.min(30,kstar), yy=sv*Math.pow(kk,av);
+    const cx=X(kk), cy=Y(yy);
+    const mk=document.createElementNS('http://www.w3.org/2000/svg','circle'); mk.setAttribute('cx',cx); mk.setAttribute('cy',cy); mk.setAttribute('r','4'); mk.setAttribute('fill','#111827'); marks.appendChild(mk);
+    const v1=document.createElementNS('http://www.w3.org/2000/svg','line'); v1.setAttribute('x1',cx);v1.setAttribute('y1',cy);v1.setAttribute('x2',cx);v1.setAttribute('y2',320);v1.setAttribute('stroke','#9ca3af');v1.setAttribute('stroke-dasharray','4 4'); marks.appendChild(v1);
+    const v2=document.createElementNS('http://www.w3.org/2000/svg','line'); v2.setAttribute('x1',60);v2.setAttribute('y1',cy);v2.setAttribute('x2',cx);v2.setAttribute('y2',cy);v2.setAttribute('stroke','#9ca3af');v2.setAttribute('stroke-dasharray','4 4'); marks.appendChild(v2);
+  }
+  ['input','change'].forEach(ev=>[s,d,n,a].forEach(el=>el.addEventListener(ev,update)));
+  update();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Consumer & Producer Surplus – Interactive</title>
+<style>
+  :root{--ink:#0f172a;--muted:#475569;--acc:#0ea5e9}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:#ffffff}
+  .wrap{max-width:1040px;margin:0 auto;padding:18px}
+  h1{font-size:24px;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:14px}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;align-items:start}
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px}
+  .eq{background:#0ea5e9;color:#fff;border-radius:12px;padding:10px 14px;font-family:ui-monospace,Consolas,monospace}
+  .controls{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+  .row{display:grid;grid-template-columns:170px 1fr 90px;gap:8px;align-items:center}
+  .out{border:1px solid #e2e8f0;border-radius:10px;padding:6px 8px;font-family:ui-monospace}
+  svg{max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:12px;background:#fff}
+  small.muted{color:#64748b}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}.controls{grid-template-columns:1fr}.row{grid-template-columns:1fr 1fr 80px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Consumer & Producer Surplus</h1>
+  <div class="sub">Điều chỉnh các tham số để thấy P*, Q*, CS, PS thay đổi.</div>
+  <div class="grid">
+    <div class="card">
+      <div class="eq">CS = ∫(D − P*) dq  •  PS = ∫(P* − S) dq  → (tuyến tính)  CS=½·Q*·(Pmax−P*),  PS=½·Q*·(P*−Pmin)</div>
+      <div class="controls">
+        <div class="row"><label>P<sub>max</sub> (intercept cầu)</label><input id="p0" type="range" min="60" max="160" value="100"><div class="out" id="p0o">100</div></div>
+        <div class="row"><label>|d| (độ dốc cầu)</label><input id="ds" type="range" step="0.2" min="0.6" max="4" value="2"><div class="out" id="dso">2.0</div></div>
+        <div class="row"><label>P<sub>min</sub> (intercept cung)</label><input id="c0" type="range" min="0" max="60" value="10"><div class="out" id="c0o">10</div></div>
+        <div class="row"><label>s (độ dốc cung)</label><input id="ss" type="range" step="0.2" min="0.4" max="3" value="1"><div class="out" id="sso">1.0</div></div>
+      </div>
+      <div style="position:relative;margin-top:14px">
+        <svg id="chart" viewBox="0 0 560 360" xmlns="http://www.w3.org/2000/svg" aria-label="CS/PS">
+          <!-- axes -->
+          <line x1="60" y1="20" x2="60" y2="320" stroke="#334155" stroke-width="2"/>
+          <line x1="60" y1="320" x2="530" y2="320" stroke="#334155" stroke-width="2"/>
+          <text x="540" y="330" font-size="12" fill="#334155">Q</text>
+          <text x="48" y="16" font-size="12" fill="#334155">P</text>
+          <g id="areas"></g>
+          <g id="lines"></g>
+          <g id="helpers"></g>
+        </svg>
+      </div>
+      <small class="muted">Mô hình tuyến tính để minh hoạ – phù hợp trình bày.</small>
+    </div>
+    <div class="card">
+      <h3>Kết quả</h3>
+      <ul>
+        <li>Giá cân bằng P* = <strong id="pstar">—</strong></li>
+        <li>Lượng cân bằng Q* = <strong id="qstar">—</strong></li>
+        <li>CS = <strong id="cs">—</strong>  •  PS = <strong id="ps">—</strong></li>
+      </ul>
+      <h3>Ghi chú</h3>
+      <p>Đường cầu: P = Pmax − |d|·Q; Đường cung: P = Pmin + s·Q. Tại cân bằng: P* và Q* là nghiệm giao nhau.</p>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const p0=$('p0'), ds=$('ds'), c0=$('c0'), ss=$('ss');
+  const p0o=$('p0o'), dso=$('dso'), c0o=$('c0o'), sso=$('sso');
+  const pstar=$('pstar'), qstar=$('qstar'), csO=$('cs'), psO=$('ps');
+  const svg=$('chart'), areas=svg.querySelector('#areas'), lines=svg.querySelector('#lines'), helpers=svg.querySelector('#helpers');
+  const X=q=>60+q*((530-60)/100);  // Q up to 100
+  const Y=p=>320-p*((320-40)/160); // P up to 160
+
+  function line(g,x1,y1,x2,y2,stroke){const L=document.createElementNS('http://www.w3.org/2000/svg','line');
+    L.setAttribute('x1',x1);L.setAttribute('y1',y1);L.setAttribute('x2',x2);L.setAttribute('y2',y2);
+    L.setAttribute('stroke',stroke);L.setAttribute('stroke-width','3');g.appendChild(L);return L;}
+  function poly(g,pts,fill,stroke){const P=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    P.setAttribute('points',pts.map(p=>p.join(',')).join(' '));P.setAttribute('fill',fill);P.setAttribute('stroke',stroke);g.appendChild(P);return P;}
+  function text(g,x,y,t,fill){const T=document.createElementNS('http://www.w3.org/2000/svg','text');
+    T.setAttribute('x',x);T.setAttribute('y',y);T.setAttribute('font-size','12');T.setAttribute('fill',fill);T.textContent=t;g.appendChild(T);return T;}
+  function clear(g){while(g.firstChild)g.removeChild(g.firstChild)}
+
+  function update(){
+    p0o.textContent=p0.value; dso.textContent=parseFloat(ds.value).toFixed(1);
+    c0o.textContent=c0.value; sso.textContent=parseFloat(ss.value).toFixed(1);
+    const P0=+p0.value, Dm=+ds.value, C0=+c0.value, Sm=+ss.value;
+    const Qs=(P0-C0)/(Dm+Sm); const Ps=P0 - Dm*Qs;
+    const Q=Math.max(0,Math.min(100,Qs)); const P=Math.max(0,Math.min(160,Ps));
+    pstar.textContent=P.toFixed(2); qstar.textContent=Q.toFixed(2);
+    clear(areas); clear(lines); clear(helpers);
+    // curves
+    line(lines, X(0), Y(P0), X(100), Y(P0- Dm*100), '#0ea5e9'); // demand
+    line(lines, X(0), Y(C0), X(100), Y(C0+ Sm*100), '#10b981'); // supply
+    // helpers
+    line(helpers, X(Q), Y(P), X(Q), Y(320), '#9ca3af');
+    line(helpers, X(60), Y(P), X(Q), Y(P), '#9ca3af');
+    // CS
+    poly(areas, [[X(0),Y(P0)],[X(Q),Y(P)],[X(0),Y(P)]], 'rgba(186,230,253,.85)', '#93c5fd');
+    // PS
+    poly(areas, [[X(0),Y(P)],[X(Q),Y(P)],[X(0),Y(C0)]], 'rgba(220,252,231,.9)', '#86efac');
+    text(helpers, X(6), Y((P0+P)/2), 'CS', '#0369a1');
+    text(helpers, X(6), Y((P+C0)/2), 'PS', '#065f46');
+    const CS=0.5*Q*(P0-P); const PS=0.5*Q*(P-C0);
+    csO.textContent=CS.toFixed(1); psO.textContent=PS.toFixed(1);
+  }
+  ['input','change'].forEach(ev=>[p0,ds,c0,ss].forEach(el=>el.addEventListener(ev,update)));
+  update();
+})();
+</script>
+</body>
+</html>

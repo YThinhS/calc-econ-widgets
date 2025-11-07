@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculus in Economics – Interactive Widgets</title>
+<style>
+  :root{--ink:#0f172a;--muted:#475569;--acc:#0ea5e9}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:#f8fafc}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 18px}
+  h1{margin:0 0 6px}
+  p{color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+  a.card{display:block;background:#fff;border:1px solid #e2e8f0;border-radius:14px;
+         padding:18px;text-decoration:none;color:inherit;transition:transform .2s ease,border-color .2s ease}
+  a.card:hover{transform:translateY(-2px);border-color:#cbd5e1}
+  small{color:#64748b}
+  footer{margin-top:24px;color:#64748b;font-size:12px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Calculus in Economics – Interactive Widgets</h1>
+    <p>Hai mô-đun tương tác: (1) <b>Consumer/Producer Surplus</b> và (2) <b>Solow Growth</b>. Dùng cho Google Sites (Embed bằng URL).</p>
+    <div class="grid">
+      <a class="card" href="csps.html">
+        <h3>Consumer & Producer Surplus</h3>
+        <p>Điều chỉnh P<sub>max</sub>, P<sub>min</sub>, độ dốc cầu/cung → tự tính P*, Q*, CS, PS (SVG).</p>
+        <small>csps.html</small>
+      </a>
+      <a class="card" href="solow.html">
+        <h3>Solow Model (per worker)</h3>
+        <p>Thay đổi s, δ, n, α → đồ thị s·f(k) và (δ+n)k cập nhật; hiển thị k*, y*.</p>
+        <small>solow.html</small>
+      </a>
+    </div>
+    <footer>Made for midterm project • Pure HTML/CSS/JS • No external libraries</footer>
+  </div>
+</body>
+</html>
