@@ -1,25 +1,45 @@
-# Calculus in Economics – Interactive Widgets
+# 🧮 Calculus in Economics – Interactive Visual Models
 
-Two standalone HTML widgets:
-- `csps.html` – Consumer/Producer Surplus with linear demand & supply.
-- `solow.html` – Solow growth (per worker).
+A bilingual, interactive website demonstrating key calculus applications in economics — including **derivatives** (marginal analysis), **integration** (consumer/producer surplus), and **differential equations** (growth models).
 
-No external libraries. Works on GitHub Pages / Netlify / any static host.
+> Built for the *Midterm Project – Calculus × Economics*  
+> **Class:** Toán Cao Cấp – HK I (2025) • **Authors:** Thịnh, Thùy, Linh
 
-## Deploy (GitHub Pages)
-1. Create a public repo, e.g., `calc-econ-widgets`.
-2. Upload the files in this folder (or the zip contents) to the repo root.
-3. In **Settings → Pages**, set **Branch: main**, **/ (root)**. Save.
-4. Wait 1–2 minutes. Your site will be available at `https://<username>.github.io/calc-econ-widgets/`
+---
 
-## Deploy (Netlify)
-1. Go to netlify.com → **Add new site → Deploy manually**.
-2. Drag-and-drop this folder (or the zip) into Netlify.
-3. The site URL will be something like `https://<random-name>.netlify.app/`.
+## 🌐 Live Site
+**Main index:**  
+👉 [https://ythinhs.github.io/calc-econ-widgets/](https://ythinhs.github.io/calc-econ-widgets/)
 
-## Embed into Google Sites
-On your Sites page: **Insert → Embed → By URL** and paste the URL to:
-- `csps.html` (for Integration section).
-- `solow.html` (for Growth Models section).
+**Widgets:**  
+- 📈 [Consumer & Producer Surplus](https://ythinhs.github.io/calc-econ-widgets/csps.html)  
+  → Adjust demand/supply slopes, observe equilibrium, CS & PS areas.  
+- ⚙️ [Solow Growth Model](https://ythinhs.github.io/calc-econ-widgets/solow.html)  
+  → Control savings rate, depreciation, population growth, and α to see steady state (k*, y*).
 
-Set the card to full width. Adjust height as needed.
+---
+
+## 🧩 Features
+- 100% pure **HTML + CSS + JavaScript** (no libraries)
+- Smooth **SVG animation** for clarity and interactivity
+- Designed for **Google Sites embed** (fully responsive)
+- Bilingual labels (🇻🇳 / 🇬🇧)
+- Optimized for academic presentation & mobile view
+
+---
+
+## 🧠 Concepts Demonstrated
+| Section | Concept | Math Representation |
+|----------|----------|--------------------|
+| Derivatives | Marginal revenue/cost | MR = MC |
+| Integration | Consumer/Producer Surplus | CS, PS = ½·Q*·ΔP |
+| Growth Models | Solow Model | s·f(k) = (δ + n)·k, f(k)=k^α |
+
+---
+
+## 🧭 Deployment
+This site is hosted via **GitHub Pages**.  
+You can clone or reuse for any academic purpose:
+
+```bash
+git clone https://github.com/YThinhS/calc-econ-widgets.git
